@@ -36,6 +36,40 @@ cols([H|Row],Y,Y2,Lqt,LL) :-
 	Y3=Y2+1,
 	cols(Row,Y,Y3,Lqt,LL).
 
+
+parityCheck(Mtx,X,Y,Par) :-
+	nth1(X,Mtx,Row),
+	nth1(Y,Row,Field),
+	write(Field),
+	(member(e,Field)->
+	write('t'),
+		length(Mtx,Len),
+		evenList(Len,Par)
+	; member(o,Field)->
+		write(Field),
+		length(Mtx,Len),
+		oddList(Len,Par)
+	).
+
+evenList(0,_).
+evenList(Len,[H|Par]) :-
+	mod(Len,2) is 0,
+	Len-1=L2,
+	evenList(L2,Par).
+oddList(0,_).
+oddList(Len,[H|Par]) :-
+	mod(Len,2) is 1,
+	Len-1=L2,
+	oddList(L2,Par).
+%these return not permitted in field 
+%parityCheck()
+%rowCheck 
+%colCheck
+%cellCheck
+%union
+
+
+
 /**
 Mtx=[[1,2,3,4],[5,6,7,8],[9,a,b,c],[d,e,f,g]],
 
