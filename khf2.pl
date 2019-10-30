@@ -1,4 +1,3 @@
-%subList(L1,L2,L3). L1
 
 subList(_,[],[]). 
 subList(L1,[H2|L2],[H2|L3]) :-
@@ -42,31 +41,79 @@ parityCheck(Mtx,X,Y,Par) :-
 	nth1(Y,Row,Field),
 	write(Field),
 	(member(e,Field)->
-	write('t'),
 		length(Mtx,Len),
-		evenList(Len,Par)
+		oddList(Len,1,Par)
 	; member(o,Field)->
 		write(Field),
 		length(Mtx,Len),
-		oddList(Len,Par)
+		evenList(Len,1,Par)
+	; Par=[]
 	).
 
-evenList(0,_).
-evenList(Len,[H|Par]) :-
-	mod(Len,2) is 0,
-	Len-1=L2,
-	evenList(L2,Par).
-oddList(0,_).
-oddList(Len,[H|Par]) :-
-	mod(Len,2) is 1,
-	Len-1=L2,
-	oddList(L2,Par).
-%these return not permitted in field 
-%parityCheck()
-%rowCheck 
-%colCheck
-%cellCheck
-%union
+evenList(0,_,[]).
+evenList(Len,X,Par) :-
+	0 is mod(Len,2),
+	Len2 is Len-1,
+	X2 is X+1,
+	evenList(Len2,X2,Par).
+evenList(Len,X,[X|Par]) :-
+	Len2 is Len-1,
+	X2 is X+1,
+	evenList(Len2,X2,Par).
+
+oddList(0,_,[]).
+oddList(Len,X,[X|Par]) :-
+	0 is mod(Len,2),
+	Len2 is Len-1,
+	X2 is X+1,
+	oddList(Len2,X2,Par).
+oddList(Len,X,Par) :-
+	Len2 is Len-1,
+	X2 is X+1,
+	oddList(Len2,X2,Par).
+
+union([],[],[]).
+union([],[H2|L2],[H2|L3]) :-
+	union([],L2,L3).
+union([H1|L1],L2,L3) :-
+	member(H1,L2),
+	union(L1,L2,L3).
+union([H1|L1],L2,[H1|L3]) :-
+	union(L1,L2,L3).
+
+rowCheck([],_,_,_).
+rowCheck([H|Mtx],X,X2,L) :-
+	write([X,X2]),
+	X = X2,
+	getField(H,L).
+rowCheck([H|Mtx],X,X2,L) :-
+	X3 is X2+1,
+	rowCheck(Mtx,X,X3,L).
+
+getField([],[]).
+getField([H|Row],[V|Vals]) :-
+	getVals(H,V),
+	V \= [],
+	getField(Row,Vals).	
+getField([H|Row],Vals) :-
+	getField(Row,Vals).
+
+getVals([],[]).
+getVals([H|F],X) :-
+	v(X) = H,
+	getVals(F,V).	
+getVals([H|F],V) :-
+	getVals(F,V).	
+
+colCheck().
+
+
+
+
+
+
+
+
 
 
 
@@ -76,3 +123,6 @@ Mtx=[[1,2,3,4],[5,6,7,8],[9,a,b,c],[d,e,f,g]],
 rows(Mtx,2,4,1,2,LL).
 
 */
+%these return not permitted in field 
+%colCheck
+%cellCheck
