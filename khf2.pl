@@ -105,10 +105,24 @@ getVals([H|F],X) :-
 getVals([H|F],V) :-
 	getVals(F,V).	
 
-colCheck().
+colCheck([],_,[]).
+colCheck([H|Mtx],Y,[V|L]) :-
+	write('t'),
+	getColField(H,Y,1,V),
+	V \= [],
+	colCheck(Mtx,Y,L).
+colCheck([H|Mtx],Y,L) :-
+	colCheck(Mtx,Y,L).
 
+getColField([H|Col],Y,Y2,V) :-
+	Y = Y2,
+	write('c2'),
+	getVals(H,V).
+getColField([H|Col],Y,Y2,V) :-
+	Y3 is Y2+1,
+	getColField(Col,Y,Y3,V).	
 
-
+cellCheck
 
 
 
@@ -124,5 +138,4 @@ rows(Mtx,2,4,1,2,LL).
 
 */
 %these return not permitted in field 
-%colCheck
 %cellCheck
