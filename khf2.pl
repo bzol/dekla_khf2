@@ -1,12 +1,18 @@
-
-subList(_,[],[]). 
-subList(L1,[H2|L2],[H2|L3]) :-
+intersection(_,[],[]). 
+intersection(L1,[H2|L2],[H2|L3]) :-
 	member(H2,L1),
-	subList(L1,L2,L3).	
-subList(L1,[H2|L2],L3) :-
-	subList(L1,L2,L3).
+	intersection(L1,L2,L4).	
+intersection(L1,[H2|L2],L3) :-
+	intersection(L1,L2,L3).
 
-getCell(Mtx,X-Y,LL) :-
+subList([],_,[]).
+subList([H1|L1],L2,[H1|L]) :-
+	\+ member(H1,L2),
+	subList(L1,L2,L).	
+subList([H1|L1],L2,L) :-
+	subList(L1,L2,L).
+
+getCell(Mtx,X,Y,LL) :-
 	length(Mtx,Len),
 	Lqt2=integer(sqrt(Len)),
 	rows(Mtx,X,Y,1,Lqt2,LL2),	
@@ -26,6 +32,7 @@ rows([H|Mtx],X,Y,X2,Lqt,LL) :-
 
 cols([],_,_,_,[]).
 cols([H|Row],Y,Y2,Lqt,[H|LL]) :-
+	write(H),
 	Yd is Y-1,
 	Y2d is Y2-1,
 	div(Yd,Lqt)=:=div(Y2d,Lqt),
@@ -122,20 +129,31 @@ getColField([H|Col],Y,Y2,V) :-
 	Y3 is Y2+1,
 	getColField(Col,Y,Y3,V).	
 
-cellCheck
+cellCheck(Mtx,X,Y,L) :-
+	getCell(Mtx,X,Y,L2),
+	getCellVals(L2,L).
 
+getCellVals([],[]).
+getCellVals([H|L],[X|L2]) :-
+	H = v(X),
+	getCellVals(L,L2).	
+getCellVals([H|L],L2) :-
+	getCellVals(L,L2).
 
+genNumbers(X,[X|L]) :-
+	X \= 0,
+	X2 is X-1,
+	genNumbers(X2,L).	
+genNumbers(_,[]).
 
-
-
-
-
-
-/**
-Mtx=[[1,2,3,4],[5,6,7,8],[9,a,b,c],[d,e,f,g]],
-
-rows(Mtx,2,4,1,2,LL).
-
-*/
-%these return not permitted in field 
-%cellCheck
+ertekek(Mtx,X-Y,L10) :-
+	cellCheck(Mtx,X,Y,L1),
+	rowCheck(Mtx,X,1,L2),
+	colCheck(Mtx,Y,L3),
+	parityCheck(Mtx,X,Y,L4),
+	union(L1,L2,L5),
+	union(L5,L3,L6),
+	union(L6,L4,L7),
+	length(Mtx,Len),
+	genNumbers(Len,L8),
+	subList(L8,L7,L10).
