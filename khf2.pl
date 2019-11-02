@@ -1,3 +1,4 @@
+/*
 intersection(_,[],[]). 
 intersection(L1,[H2|L2],[H2|L3]) :-
 	member(H2,L1),
@@ -12,11 +13,14 @@ subList([H1|L1],L2,[H1|L]) :-
 subList([H1|L1],L2,L) :-
 	subList(L1,L2,L).
 
-getCell(Mtx,X,Y,LL) :-
-	length(Mtx,Len),
-	Lqt2=integer(sqrt(Len)),
-	rows(Mtx,X,Y,1,Lqt2,LL2),	
-	flatten(LL2,LL).
+flatten2([],[]).
+flatten2([H2|L2],L3) :-
+	append(H2,L,L3),
+	flatten2(L2,L).
+
+getCell(Mtx,X,Y,Len,LL) :-
+	rows(Mtx,X,Y,1,Len,LL2),	
+	flatten2(LL2,LL).
 
 rows([],_,_,_,_,[]). 
 rows([H|Mtx],X,Y,X2,Lqt,[Hc|LL]) :-
@@ -32,7 +36,6 @@ rows([H|Mtx],X,Y,X2,Lqt,LL) :-
 
 cols([],_,_,_,[]).
 cols([H|Row],Y,Y2,Lqt,[H|LL]) :-
-	write(H),
 	Yd is Y-1,
 	Y2d is Y2-1,
 	div(Yd,Lqt)=:=div(Y2d,Lqt),
@@ -42,17 +45,23 @@ cols([H|Row],Y,Y2,Lqt,LL) :-
 	Y3=Y2+1,
 	cols(Row,Y,Y3,Lqt,LL).
 
+nth2(X,L2,Res) :-
+	nth3(X,1,L2,Res).	
 
-parityCheck(Mtx,X,Y,Par) :-
-	nth1(X,Mtx,Row),
-	nth1(Y,Row,Field),
-	write(Field),
+nth3(_,_,[],nil).
+nth3(X,X2,[H|L2],Res) :-
+	X = X2,
+	Res = H.
+nth3(X,X2,[H|L2],Res) :-
+	X3 is X2+1,
+	nth3(X,X3,L2,Res).
+
+parityCheck(Mtx,X,Y,Len,Par) :-
+	nth2(X,Mtx,Row),
+	nth2(Y,Row,Field),
 	(member(e,Field)->
-		length(Mtx,Len),
 		oddList(Len,1,Par)
 	; member(o,Field)->
-		write(Field),
-		length(Mtx,Len),
 		evenList(Len,1,Par)
 	; Par=[]
 	).
@@ -90,7 +99,6 @@ union([H1|L1],L2,[H1|L3]) :-
 
 rowCheck([],_,_,_).
 rowCheck([H|Mtx],X,X2,L) :-
-	write([X,X2]),
 	X = X2,
 	getField(H,L).
 rowCheck([H|Mtx],X,X2,L) :-
@@ -114,7 +122,6 @@ getVals([H|F],V) :-
 
 colCheck([],_,[]).
 colCheck([H|Mtx],Y,[V|L]) :-
-	write('t'),
 	getColField(H,Y,1,V),
 	V \= [],
 	colCheck(Mtx,Y,L).
@@ -123,14 +130,13 @@ colCheck([H|Mtx],Y,L) :-
 
 getColField([H|Col],Y,Y2,V) :-
 	Y = Y2,
-	write('c2'),
 	getVals(H,V).
 getColField([H|Col],Y,Y2,V) :-
 	Y3 is Y2+1,
 	getColField(Col,Y,Y3,V).	
 
-cellCheck(Mtx,X,Y,L) :-
-	getCell(Mtx,X,Y,L2),
+cellCheck(Mtx,X,Y,Len,L) :-
+	getCell(Mtx,X,Y,Len,L2),
 	getCellVals(L2,L).
 
 getCellVals([],[]).
@@ -146,14 +152,24 @@ genNumbers(X,[X|L]) :-
 	genNumbers(X2,L).	
 genNumbers(_,[]).
 
-ertekek(Mtx,X-Y,L10) :-
-	cellCheck(Mtx,X,Y,L1),
-	rowCheck(Mtx,X,1,L2),
-	colCheck(Mtx,Y,L3),
-	parityCheck(Mtx,X,Y,L4),
-	union(L1,L2,L5),
-	union(L5,L3,L6),
-	union(L6,L4,L7),
-	length(Mtx,Len),
-	genNumbers(Len,L8),
-	subList(L8,L7,L10).
+getMtx(s(Len,Mtx),Len,Mtx).
+	
+*/
+		
+%ertekek(s(1,[[[]]]),1-1,[1]).
+ertekek(s(Len,Mtx),X-Y,L10) :-
+	
+	write('t'),
+	write('t'),
+	L10 is 3.
+	%getMtx(Smtx,Len,Mtx).
+	%cellCheck(Mtx,X,Y,Len,L1).
+	%rowCheck(Mtx,X,1,L2),
+	%colCheck(Mtx,Y,L3),
+	%parityCheck(Mtx,X,Y,Len,L4),
+	%union(L1,L2,L5),
+	%union(L5,L3,L6),
+	%union(L6,L4,L7),
+	%Len2 is Len*Len,
+	%genNumbers(Len2,L8),
+	%subList(L8,L7,L10).
