@@ -1,7 +1,8 @@
-intersection(_,[],[]). 
+intersection(_,[],L) :-
+	L =[], !.
 intersection(L1,[H2|L2],[H2|L3]) :-
 	member2(H2,L1),
-	intersection(L1,L2,L4).	
+	intersection(L1,L2,L4), !.	
 intersection(L1,[H2|L2],L3) :-
 	intersection(L1,L2,L3).
 
@@ -173,19 +174,21 @@ getFieldVal(Mtx,X,Y,Len2,Val2) :-
 getFieldVal(_,_,_,_,L) :-
 	L=[].
 
-ertekek(s(Len,Mtx),X-Y,L11) :-
+ertekek(s(Len,Mtx),X-Y,L12) :-
 	Len2 is Len*Len,
 	colCheck(Mtx,Y,L1),
 	rowCheck(Mtx,X,1,L2),
 	parityCheck(Mtx,X,Y,Len,L3),
 	cellCheck(Mtx,X,Y,Len,L4),
-	getFieldVal(Mtx,X,Y,Len2,L5),
-
 	union(L1,L2,L6),
 	union(L6,L3,L7),
 	union(L7,L4,L8),
-	union(L8,L5,L9),
 	genNumbers(Len2,L10),
-
-	subList(L10,L9,L11),
-	write(L10).
+	getFieldVal(Mtx,X,Y,Len2,FV),
+	write(FV),
+	( FV = [] ->
+		subList(L10,L8,L12)
+	; %union(L8,FV,L9)
+	  %subList(L10,L8,L12)
+	  L12 = FV
+	).
