@@ -5,12 +5,13 @@ intersection(L1,[H2|L2],[H2|L3]) :-
 intersection(L1,[H2|L2],L3) :-
 	intersection(L1,L2,L3).
 
-subList([],_,[]).
+subList([],_,L) :-
+	L = [], !.	
 subList([H1|L1],L2,[H1|L]) :-
 	\+ member2(H1,L2),
-	subList(L1,L2,L).	
+	subList(L1,L2,L), !.	
 subList([H1|L1],L2,L) :-
-	subList(L1,L2,L).
+	subList(L1,L2,L), !.
 
 flatten2([],[]).
 flatten2([H2|L2],L3) :-
@@ -47,10 +48,9 @@ cols([H|Row],Y,Y2,Lqt,LL) :-
 nth2(X,L2,Res) :-
 	nth3(X,1,L2,Res).	
 
-nth3(_,_,[],nil).
 nth3(X,X2,[H|L2],Res) :-
 	X = X2,
-	Res = H.
+	Res = H, !.
 nth3(X,X2,[H|L2],Res) :-
 	X3 is X2+1,
 	nth3(X,X3,L2,Res).
@@ -58,51 +58,56 @@ nth3(X,X2,[H|L2],Res) :-
 parityCheck(Mtx,X,Y,Len,Par) :-
 	nth2(X,Mtx,Row),
 	nth2(Y,Row,Field),
+	Len2 is Len*Len,
+	write(Field),
 	(member2(e,Field)->
-		oddList(Len,1,Par)
+		oddList(Len2,1,Par)
 	; member2(o,Field)->
-		evenList(Len,1,Par)
-	; Par=[]
+		evenList(Len2,1,Par)
+	; Par = []
 	).
 
-evenList(0,_,[]).
-evenList(Len,X,Par) :-
-	0 is mod(Len,2),
-	Len2 is Len-1,
-	X2 is X+1,
-	evenList(Len2,X2,Par).
+evenList(0,_,Par) :-
+	Par = [], !.
 evenList(Len,X,[X|Par]) :-
+	0 is mod(X,2),
 	Len2 is Len-1,
 	X2 is X+1,
-	evenList(Len2,X2,Par).
+	evenList(Len2,X2,Par), !.
+evenList(Len,X,Par) :-
+	Len2 is Len-1,
+	X2 is X+1,
+	evenList(Len2,X2,Par), !.
 
-oddList(0,_,[]).
+oddList(0,_,Par) :-
+	Par = [], !.
 oddList(Len,X,[X|Par]) :-
-	0 is mod(Len,2),
+	1 is mod(X,2),
 	Len2 is Len-1,
 	X2 is X+1,
-	oddList(Len2,X2,Par).
+	oddList(Len2,X2,Par), !.
 oddList(Len,X,Par) :-
 	Len2 is Len-1,
 	X2 is X+1,
-	oddList(Len2,X2,Par).
+	oddList(Len2,X2,Par), !.
 
-member2(_,[]) :-
-	false.
 member2(X,[H|L]) :-
 	X = H,
-	true.
+	true, !.
 member2(X,[H|L]) :-
-	member2(X,L).
+	member2(X,L), !.
+member2(_,[]) :-
+	false.
 
-union([],[],[]).
+union([],[],L) :-
+	L = [], !.
 union([],[H2|L2],[H2|L3]) :-
-	union([],L2,L3).
+	union([],L2,L3), !.
 union([H1|L1],L2,L3) :-
 	member2(H1,L2),
-	union(L1,L2,L3).
+	union(L1,L2,L3), !.
 union([H1|L1],L2,[H1|L3]) :-
-	union(L1,L2,L3).
+	union(L1,L2,L3), !.
 
 %rowCheck([],_,_,_).
 rowCheck([H|Mtx],X,X2,L) :-
@@ -156,25 +161,31 @@ getCellVals([H|L],L2) :-
 genNumbers(X,[X|L]) :-
 	X \= 0,
 	X2 is X-1,
-	genNumbers(X2,L).	
+	genNumbers(X2,L), !.	
 genNumbers(_,[]).
 
-%ertekek(s(1,[[[]]]),1-1,[1]).
-ertekek(s(Len,Mtx),X-Y,L5) :-
-	cellCheck(Mtx,X,Y,Len,L6),
-	colCheck(Mtx,Y,L5).
-	%rowCheck(Mtx,X,1,L5).
-	%parityCheck(Mtx,X,Y,Len,L5).
+getFieldVal(Mtx,X,Y,Len2,Val2) :-
+	nth2(X,Mtx,Row),
+	nth2(Y,Row,Field),
+	getVals(Field,Val),
+	Val \= [],
+	Val2 = [Val], !.
+getFieldVal(_,_,_,_,L) :-
+	L=[].
 
-	%union(L2,L3,L5).
-	/*
-
-	union(L1,L2,L5),
-	union(L5,L3,L6),
-	union(L6,L4,L7),
+ertekek(s(Len,Mtx),X-Y,L11) :-
 	Len2 is Len*Len,
-	genNumbers(Len2,L8),
-	subList(L8,L7,L10).
+	colCheck(Mtx,Y,L1),
+	rowCheck(Mtx,X,1,L2),
+	parityCheck(Mtx,X,Y,Len,L3),
+	cellCheck(Mtx,X,Y,Len,L4),
+	getFieldVal(Mtx,X,Y,Len2,L5),
 
-	['/home/zozo/programming/software/dekla/dekla_khf2/khf2.pl'].
-*/
+	union(L1,L2,L6),
+	union(L6,L3,L7),
+	union(L7,L4,L8),
+	union(L8,L5,L9),
+	genNumbers(Len2,L10),
+
+	subList(L10,L9,L11),
+	write(L10).
