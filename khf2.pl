@@ -2,7 +2,8 @@ intersection(_,[],L) :-
 	L =[], !.
 intersection(L1,[H2|L2],[H2|L3]) :-
 	member2(H2,L1),
-	intersection(L1,L2,L4), !.	
+	write(H2),
+	intersection(L1,L2,L3), !.	
 intersection(L1,[H2|L2],L3) :-
 	intersection(L1,L2,L3).
 
@@ -185,10 +186,13 @@ ertekek(s(Len,Mtx),X-Y,L12) :-
 	union(L7,L4,L8),
 	genNumbers(Len2,L10),
 	getFieldVal(Mtx,X,Y,Len2,FV),
+	intersection(L8,FV,Li),
 	write(FV),
+	write(Li),
 	( FV = [] ->
 		subList(L10,L8,L12)
-	; %union(L8,FV,L9)
 	  %subList(L10,L8,L12)
-	  L12 = FV
+	; Li = [] ->
+		L12 = FV
+	; L12 = []
 	).
