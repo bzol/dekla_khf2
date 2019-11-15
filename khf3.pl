@@ -21,8 +21,7 @@ flatten2([H2|L2],L3) :-
 
 getCell(Mtx,X,Y,Len,LL) :-
 	rows(Mtx,X,Y,1,Len,LL2),	
-	flatten2(LL2,LL),
-	write(LL).
+	flatten2(LL2,LL).
 
 rows([],_,_,_,_,[]). 
 
@@ -39,10 +38,6 @@ rows([H|Mtx],X,Y,X2,Lqt,LL) :-
 
 cols([],_,_,_,_,_,[]).
 cols([H|Row],X,Y,X2,Y2,Lqt,LL) :-
-	write(t),
-	write(X2),
-	write(Y2),
-
 	X = X2,
 	Y = Y2,
 	Y3 is Y2+1,
@@ -71,7 +66,6 @@ parityCheck(Mtx,X,Y,Len,Par) :-
 	nth2(X,Mtx,Row),
 	nth2(Y,Row,Field),
 	Len2 is Len*Len,
-	write(Field),
 	(member2(e,Field)->
 		oddList(Len2,1,Par)
 	; member2(o,Field)->
@@ -122,11 +116,9 @@ union([H1|L1],L2,[H1|L3]) :-
 	union(L1,L2,L3), !.
 
 rowCheck([H|Mtx],X-Y,X2,L) :-
-	write(a),
 	X = X2,
 	getField(H,Y,1,L), !.
 rowCheck([H|Mtx],X-Y,X2,L) :-
-	write(b),
 	X3 is X2+1,
 	rowCheck(Mtx,X-Y,X3,L).
 
@@ -206,10 +198,10 @@ ertekek(s(Len,Mtx),X-Y,L12) :-
 	rowCheck(Mtx,X-Y,1,L2),
 	parityCheck(Mtx,X,Y,Len,L3),
 	cellCheck(Mtx,X,Y,Len,L4),
+	%keresett mezoertek [v(x)] alaku, nem kezeli jol
 	union(L1,L2,L6),
 	union(L6,L3,L7),
 	union(L7,L4,L8),
-	write(L4),
 
 	genNumbers(Len2,L10),
 	intersection(L8,FV,Li),
@@ -220,3 +212,133 @@ ertekek(s(Len,Mtx),X-Y,L12) :-
 		L12 = FV
 	; L12 = []
 	).
+
+%khf3
+isRepeatedElementsInList(L) :-
+	repElemUtil(L,L).
+
+repElemUtil(L,[H|L2]) :-
+	\+ member2(H,L2),
+	repElemUtil(L,L2).	
+repElemUtil(_,[]) :-
+	true.
+
+rows2(Mtx,[H|Sol],X-Y) :-
+	rcols2(Mtx,H,X-Y),
+	isRepeatedElementsInList(H),
+	X2 is X+1,
+	rows2(Mtx,Sol,X2-Y), !.
+rows2(_,[],_) :-
+	true.
+
+rcols2(Mtx,[H2|Row],X-Y) :-
+	ertekek(Mtx,X-Y,L),
+	member2(H2,L),
+	Y2 is Y+1,
+	rcols2(Mtx,Row,X-Y2), !.
+rcols2(_,[],_) :-
+	true.
+
+getCols(Mtx,Y,[]) :-
+	length(Mtx,Y), !.
+getCols(Mtx,Y,[H|L]) :-
+	Y2 is Y+1,
+	getCols2(Mtx,Y2,H),
+	getCols(Mtx,Y2,L), !.
+
+getCols2([],_,[]).
+getCols2([H|Mtx],Y,[H2|Rest]) :-
+	nth2(Y,H,H2),
+
+	getCols2(Mtx,Y,Rest), !.
+
+getCell3(Mtx,X,Y,Len,LL) :-
+	rows3(Mtx,X,Y,1,Len,LL2),	
+	flatten2(LL2,LL).
+
+rows3([],_,_,_,_,[]). 
+
+rows3([H|Mtx],X,Y,X2,Lqt,[Hc|LL]) :-
+	X =< X2,
+	XU is X+Lqt,
+	X2 < XU,
+	cols3(H,X,Y,X2,1,Lqt,Hc),
+	X3 is X2+1,
+	rows3(Mtx,X,Y,X3,Lqt,LL), !.
+rows3([H|Mtx],X,Y,X2,Lqt,LL) :-
+	X3 is X2+1,
+	rows3(Mtx,X,Y,X3,Lqt,LL).
+
+cols3([],_,_,_,_,_,[]).
+cols3([H|Row],X,Y,X2,Y2,Lqt,[H|LL]) :-
+	Y =< Y2,
+	YU =Y + Lqt,
+	Y2 < YU,
+	Y3 is Y2+1,
+	cols3(Row,X,Y,X2,Y3,Lqt,LL), !.
+cols3([H|Row],X,Y,X2,Y2,Lqt,LL) :-
+	Y3 is Y2+1,
+	cols3(Row,X,Y,X2,Y3,Lqt,LL).
+
+getCells2(Mtx,X,Len,[]) :-
+	Len2 is Len*Len,
+	X >= Len2, !.
+getCells2(Mtx,X,Len,LLC) :-
+	X2 is X + Len,
+	getCells2Col(Mtx,X-1,Len,CL),
+	append(CL,LL,LLC),
+	getCells2(Mtx,X2,Len,LL), !.
+
+getCells2Col(_,X-Y,Len,[]) :-
+	Len2 is Len*Len,
+	Y >= Len2, !. 
+getCells2Col(Mtx,X-Y,Len,[H|CL]) :-
+	getCell3(Mtx,X,Y,Len,H),
+	Y2 is Y+Len,
+	getCells2Col(Mtx,X-Y2,Len,CL), !. 
+
+checkColRepeat(Mtx) :-
+	getCols(Mtx,0,L),
+	repeatElementsInListOfLists(L).
+
+repeatElementsInListOfLists([]).
+repeatElementsInListOfLists([H|L]) :-
+	isRepeatedElementsInList(H),
+	repeatElementsInListOfLists(L), !.
+
+checkCellRepeat(Mtx,Len) :-
+	getCells2(Mtx,1,Len,L),
+	repeatElementsInListOfLists(L).
+
+checkWestSouth([],[],_).
+checkWestSouth([H|Mtx],[H2|Sol],Type) :-
+	checkWSU(H,H2,nil,Type),
+	checkWestSouth(Mtx,Sol,Type).
+
+checkWSU([],[],_,_).
+checkWSU([H|Row],[H2|Row2],Pelem,Type) :-
+	( member2(Type,H) -> checkParity(Pelem,H2)
+	; checkWSU(Row,Row2,H2,Type) 
+	).
+
+checkParity(A,B) :-
+	C is A+B,
+	D is mod(C,2),
+       	D \= 0.
+
+reverse2([],[]).
+reverse2([H|L1],Res) :-
+	append(L2,[H],Res),
+	reverse2(L1,L2).
+
+megoldase(s(Len,Mtx),Sol) :-
+	rows2(s(Len,Mtx),Sol,1-1),
+	checkColRepeat(Sol),
+	checkCellRepeat(Sol,Len),
+	getCols(Mtx,0,Column),
+	checkWestSouth(Mtx,Sol,w),
+	getCols(Sol,0,Sol2),
+	reverse2(Sol2,Sol3),
+	checkWestSouth(Mtx,Sol,s).
+
+%rows2,colRepeat,CellRepeat
